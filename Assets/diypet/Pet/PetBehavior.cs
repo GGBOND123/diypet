@@ -9,6 +9,8 @@ namespace diypet
     {
         private FSMSystem fsm;
 
+        public string currentState;
+
         // setting this to true will allow other needs/conditions to build while
         // the player is dealing with a present condition/need 
         public bool parallelResourceLoss;
@@ -20,12 +22,12 @@ namespace diypet
             public StateID needID;
             public Transition transition;
 
-            public int currentNeedLevel = 0;
-            public int hasNeedThreshold;
+            public float currentNeedLevel = 0;
+            public float hasNeedThreshold;
             [Range(1, 30)]
-            public int minNeedGainRate;
+            public float minNeedGainRate;
             [Range(1, 30)]
-            public int maxNeedGainRate;
+            public float maxNeedGainRate;
 
         }
 
@@ -43,13 +45,27 @@ namespace diypet
             MakeFSM();
         }
 
+        public void Update() {
+            currentState = fsm.CurrentStateID.ToString();
+            fsm.CurrentState.Reason(gameObject);
+            fsm.CurrentState.Act(gameObject);
+        }
+
         private void MakeFSM()
         {
+            SatisifiedState satisfied = new SatisifiedState();
+            satisfied.AddTransition(Transition.IsHungry, StateID.Hungry);
 
+            HungryState hungry = new HungryState();
+            hungry.AddTransition(Transition.IsSatisfied, StateID.Satisified);
+
+            fsm = new FSMSystem();
+            fsm.AddState(satisfied);
+            fsm.AddState(hungry);
         }
 
         public void IncrementAllNeeds()
-        {
+        {    
             // This will take each individual need and increment it per call
             // for each need it will take the min and max and randomly pick a value
             // within that range
@@ -70,15 +86,17 @@ namespace diypet
             {
                 if (needs[i].needID == needID)
                 {
+                    float needVal = 0;
+
                     if (needs[i].minNeedGainRate >= needs[i].maxNeedGainRate)
                     {
-                        needs[i].currentNeedLevel += needs[i].maxNeedGainRate;
+                        needVal = needs[i].maxNeedGainRate;
                     }
                     else
                     {
-                        int needVal = UnityEngine.Random.Range(needs[i].minNeedGainRate, needs[i].maxNeedGainRate + 1);
-                        needs[i].currentNeedLevel += needVal;
+                        needVal = UnityEngine.Random.Range(needs[i].minNeedGainRate, needs[i].maxNeedGainRate);
                     }
+                    needs[i].currentNeedLevel += needVal * Time.deltaTime;
                     break;
                 }
             }

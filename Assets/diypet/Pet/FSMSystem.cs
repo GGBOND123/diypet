@@ -166,19 +166,17 @@ public abstract class FSMState
     /// This method decides if the state should transition to another on its list
     /// NPC is a reference to the object that is controlled by this class
     /// </summary>
-    //public abstract void Reason(GameObject player, GameObject npc);
+    public abstract void Reason(GameObject pet);
+    
 
     /// <summary>
     /// This method controls the behavior of the NPC in the game World.
     /// Every action, movement or communication the NPC does should be placed here
     /// NPC is a reference to the object that is controlled by this class
     /// </summary>
-    //public abstract void Act(GameObject player, GameObject npc);
-
-    // Added because I don't think we need a player ref
     public abstract void Act(GameObject pet);
 
-    public abstract void Reason(GameObject pet);
+
 
 } // class FSMState
 
