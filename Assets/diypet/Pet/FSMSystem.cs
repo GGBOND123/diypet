@@ -67,7 +67,9 @@ public enum StateID
 {
     NullStateID = 0, // Use this ID to represent a non-existing State in your system	
     Satisified,
-    Hungry
+    Hungry,
+	// Immediate state enums will be from 10 up (change number if needed)
+	FreeFalling = 10
 }
 
 /// <summary>

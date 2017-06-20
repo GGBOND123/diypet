@@ -51,6 +51,11 @@ namespace diypet
             fsm.CurrentState.Act(gameObject);
         }
 
+		public void SetFreeFalling() {
+			// Set the stateID to free fall
+			//
+		}
+
         private void MakeFSM()
         {
             SatisifiedState satisfied = new SatisifiedState();
@@ -182,6 +187,9 @@ namespace diypet
 
             public override void Reason(GameObject pet)
             {
+				// If immediate behavior is set move to that
+				// but store old state to switch back to after
+				// out of immediate state
                 if (behavior == null)
                 {
                     behavior = pet.GetComponent<PetBehavior>();
