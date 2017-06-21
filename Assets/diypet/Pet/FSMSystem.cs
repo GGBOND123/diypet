@@ -56,7 +56,8 @@ public enum Transition
 {
     NullTransition = 0, // Use this transition to represent a non-existing transition in your system
     IsSatisfied,
-    IsHungry
+    IsHungry,
+    IsFreeFalling
 }
 
 /// <summary>
