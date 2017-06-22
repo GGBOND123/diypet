@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BirdController : MonoBehaviour {
 
+    public float speed;
+
     private GameObject target;
     private float despawn = 0f;
 
@@ -12,7 +14,7 @@ public class BirdController : MonoBehaviour {
 	}
 	
 	void Update () {
-        transform.RotateAround(Vector3.zero, Vector3.up, 50f * Time.deltaTime);
+        transform.RotateAround(Vector3.zero, Vector3.up, this.speed * Time.deltaTime);
         transform.LookAt(Vector3.up);
 
         if (this.despawn >= 60f)
