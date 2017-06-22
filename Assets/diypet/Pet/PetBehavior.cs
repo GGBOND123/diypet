@@ -41,6 +41,7 @@ namespace diypet
 
         public void Start() {
             MakeFSM();
+            interruptedStateTransition = Transition.IsSatisfied;
         }
 
         public void Update() {
@@ -63,6 +64,7 @@ namespace diypet
             fsm = new FSMSystem();
             fsm.AddState(satisfied);
             fsm.AddState(hungry);
+            fsm.AddState(freeFalling);
         }
 
         private void GetPreInterruptedState() {
@@ -79,17 +81,26 @@ namespace diypet
 
         private void ReturnToPreInterruptedState() {
             fsm.PerformTransition(Transition.IsSatisfied);
-            fsm.PerformTransition(interruptedStateTransition);
+            if (interruptedStateTransition != Transition.IsSatisfied) {
+                fsm.PerformTransition(interruptedStateTransition);
+            }
             interruptedStateTransition = Transition.IsSatisfied;
         }
 
         public void StartFreeFalling() {
-            GetPreInterruptedState();
-            fsm.PerformTransition(Transition.IsFreeFalling);
+            if (fsm.CurrentStateID != StateID.FreeFalling) {
+                GetPreInterruptedState();
+                if (fsm.CurrentStateID != StateID.Satisified) {
+                    fsm.PerformTransition(Transition.IsSatisfied);
+                }
+                fsm.PerformTransition(Transition.IsFreeFalling);
+            }
         }
 
         public void EndFreeFalling() {
-            ReturnToPreInterruptedState();
+            if (fsm.CurrentStateID == StateID.FreeFalling) {
+                ReturnToPreInterruptedState();
+            }
         }
 
         public void IncrementAllNeeds() {
