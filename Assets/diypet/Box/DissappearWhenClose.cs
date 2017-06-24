@@ -8,6 +8,7 @@ namespace diypet
     {
         public GameObject head;
         private bool wasClose = false;
+        public Timer timer;
 
         // Use this for initialization
         void Start()
@@ -20,7 +21,11 @@ namespace diypet
         {
             if (Vector3.Distance(head.transform.position, gameObject.transform.position) < 0.75f)
             {
-                wasClose = true;
+                if (transform.position != Vector3.zero)
+                {
+                    wasClose = true;
+                    timer.TurnOn();
+                }
             }            
 
             if (wasClose)
