@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 3c6db452420fab9408a439d766add239
-timeCreated: 1497832195
+timeCreated: 1497977876
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
@@ -83,7 +83,279 @@ ModelImporter:
     animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Default Take
+      takeName: Default Take
+      firstFrame: 0
+      lastFrame: 89
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/L_Hip
+        weight: 1
+      - path: Armature/L_Hip/L_Thigh
+        weight: 1
+      - path: Armature/L_Hip/L_Thigh/L_Leg
+        weight: 1
+      - path: Armature/R_Hip
+        weight: 1
+      - path: Armature/R_Hip/R_Thigh
+        weight: 1
+      - path: Armature/R_Hip/R_Thigh/R_Leg
+        weight: 1
+      - path: Armature/Torso
+        weight: 1
+      - path: Armature/Torso/Head
+        weight: 1
+      - path: Armature/Torso/LShoulder
+        weight: 1
+      - path: Armature/Torso/LShoulder/L_Arm
+        weight: 1
+      - path: Armature/Torso/LShoulder/L_Arm/L_Hand
+        weight: 1
+      - path: Armature/Torso/R_Shoulder
+        weight: 1
+      - path: Armature/Torso/R_Shoulder/R_Arm
+        weight: 1
+      - path: Armature/Torso/R_Shoulder/R_Arm/R_Hand
+        weight: 1
+      - path: blue
+        weight: 1
+      - path: green
+        weight: 1
+      - path: HTC_Vive_Tracker
+        weight: 1
+      - path: white
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Idle_1
+      takeName: Idle_1
+      firstFrame: 0
+      lastFrame: 671
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/L_Hip
+        weight: 1
+      - path: Armature/L_Hip/L_Thigh
+        weight: 1
+      - path: Armature/L_Hip/L_Thigh/L_Leg
+        weight: 1
+      - path: Armature/R_Hip
+        weight: 1
+      - path: Armature/R_Hip/R_Thigh
+        weight: 1
+      - path: Armature/R_Hip/R_Thigh/R_Leg
+        weight: 1
+      - path: Armature/Torso
+        weight: 1
+      - path: Armature/Torso/Head
+        weight: 1
+      - path: Armature/Torso/LShoulder
+        weight: 1
+      - path: Armature/Torso/LShoulder/L_Arm
+        weight: 1
+      - path: Armature/Torso/LShoulder/L_Arm/L_Hand
+        weight: 1
+      - path: Armature/Torso/R_Shoulder
+        weight: 1
+      - path: Armature/Torso/R_Shoulder/R_Arm
+        weight: 1
+      - path: Armature/Torso/R_Shoulder/R_Arm/R_Hand
+        weight: 1
+      - path: blue
+        weight: 1
+      - path: green
+        weight: 1
+      - path: HTC_Vive_Tracker
+        weight: 1
+      - path: white
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Idle_2
+      takeName: Idle_2
+      firstFrame: 0
+      lastFrame: 119
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/L_Hip
+        weight: 1
+      - path: Armature/L_Hip/L_Thigh
+        weight: 1
+      - path: Armature/L_Hip/L_Thigh/L_Leg
+        weight: 1
+      - path: Armature/R_Hip
+        weight: 1
+      - path: Armature/R_Hip/R_Thigh
+        weight: 1
+      - path: Armature/R_Hip/R_Thigh/R_Leg
+        weight: 1
+      - path: Armature/Torso
+        weight: 1
+      - path: Armature/Torso/Head
+        weight: 1
+      - path: Armature/Torso/LShoulder
+        weight: 1
+      - path: Armature/Torso/LShoulder/L_Arm
+        weight: 1
+      - path: Armature/Torso/LShoulder/L_Arm/L_Hand
+        weight: 1
+      - path: Armature/Torso/R_Shoulder
+        weight: 1
+      - path: Armature/Torso/R_Shoulder/R_Arm
+        weight: 1
+      - path: Armature/Torso/R_Shoulder/R_Arm/R_Hand
+        weight: 1
+      - path: blue
+        weight: 1
+      - path: green
+        weight: 1
+      - path: HTC_Vive_Tracker
+        weight: 1
+      - path: white
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Sad
+      takeName: Sad
+      firstFrame: 0
+      lastFrame: 89
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/L_Hip
+        weight: 1
+      - path: Armature/L_Hip/L_Thigh
+        weight: 1
+      - path: Armature/L_Hip/L_Thigh/L_Leg
+        weight: 1
+      - path: Armature/R_Hip
+        weight: 1
+      - path: Armature/R_Hip/R_Thigh
+        weight: 1
+      - path: Armature/R_Hip/R_Thigh/R_Leg
+        weight: 1
+      - path: Armature/Torso
+        weight: 1
+      - path: Armature/Torso/Head
+        weight: 1
+      - path: Armature/Torso/LShoulder
+        weight: 1
+      - path: Armature/Torso/LShoulder/L_Arm
+        weight: 1
+      - path: Armature/Torso/LShoulder/L_Arm/L_Hand
+        weight: 1
+      - path: Armature/Torso/R_Shoulder
+        weight: 1
+      - path: Armature/Torso/R_Shoulder/R_Arm
+        weight: 1
+      - path: Armature/Torso/R_Shoulder/R_Arm/R_Hand
+        weight: 1
+      - path: blue
+        weight: 1
+      - path: green
+        weight: 1
+      - path: HTC_Vive_Tracker
+        weight: 1
+      - path: white
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 1
   meshes:
     lODScreenPercentages: []
