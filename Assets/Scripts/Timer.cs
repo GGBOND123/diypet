@@ -10,8 +10,7 @@ public class Timer : MonoBehaviour {
         this.timer += Time.deltaTime;
         if (this.timer >= 1f && this.cutoff > .09f)
         {
-            //this.cutoff -= 0.0033f;
-            this.cutoff -= 0.05f;
+            this.cutoff -= 0.0033f;
             GetComponent<Renderer>().material.SetFloat("_Cutoff", this.cutoff);
             this.timer = 0f;
         }
