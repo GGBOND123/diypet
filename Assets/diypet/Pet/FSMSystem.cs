@@ -57,7 +57,11 @@ public enum Transition
     NullTransition = 0, // Use this transition to represent a non-existing transition in your system
     IsSatisfied,
     IsHungry,
-    IsFreeFalling
+    IsDirty,
+    IsSleepy,
+    IsLonely,
+    IsBored,
+    IsScreaming
 }
 
 /// <summary>
@@ -69,7 +73,11 @@ public enum StateID
     NullStateID = 0, // Use this ID to represent a non-existing State in your system	
     Satisified,
     Hungry,
-    FreeFalling
+    Dirty,
+    Sleepy,
+    Lonely,
+    Bored,
+    Screaming
 }
 
 /// <summary>
@@ -168,7 +176,7 @@ public abstract class FSMState
     /// This method decides if the state should transition to another on its list
     /// NPC is a reference to the object that is controlled by this class
     /// </summary>
-    public abstract void Reason(GameObject pet);
+    public abstract void Reason();
     
 
     /// <summary>
@@ -176,7 +184,7 @@ public abstract class FSMState
     /// Every action, movement or communication the NPC does should be placed here
     /// NPC is a reference to the object that is controlled by this class
     /// </summary>
-    public abstract void Act(GameObject pet);
+    public abstract void Act();
 
 
 
