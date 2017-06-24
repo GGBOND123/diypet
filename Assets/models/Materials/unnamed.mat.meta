@@ -1,6 +1,10 @@
 fileFormatVersion: 2
 guid: a1dd4d19a3158414b893b708768bfd8f
+<<<<<<< HEAD
 timeCreated: 1498335062
+=======
+timeCreated: 1498001638
+>>>>>>> origin/tristan
 licenseType: Free
 NativeFormatImporter:
   mainObjectFileID: 2100000

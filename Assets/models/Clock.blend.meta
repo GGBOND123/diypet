@@ -1,6 +1,10 @@
 fileFormatVersion: 2
 guid: e99f7787269963b48a1f89d85a13ae2c
+<<<<<<< HEAD
 timeCreated: 1498335063
+=======
+timeCreated: 1498239993
+>>>>>>> origin/tristan
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
