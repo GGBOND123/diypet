@@ -360,6 +360,13 @@ namespace diypet
             }
         }
 
+        public void MakePetHappy(float happyAmount) {
+            happyNeed.currentNeedLevel += happyAmount;
+            if (hungryNeed.currentNeedLevel > happyNeed.maxNeedLevel) {
+                hungryNeed.currentNeedLevel = happyNeed.maxNeedLevel;
+            }
+        }
+
         // Reactive States/Conditions and their related function calls
 
         public class HungryState : FSMState {
