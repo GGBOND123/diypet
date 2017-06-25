@@ -6,7 +6,7 @@ namespace diypet {
     public class EventHandler : MonoBehaviour
     {
 
-        Timer time = new Timer();
+        TimeManager time = new TimeManager();
 
                 // Update is called once per frame
         void Update()
