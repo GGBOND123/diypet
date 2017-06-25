@@ -11,9 +11,16 @@ namespace diypet
             if (c.tag == "Pet")
             {
                 c.GetComponent<PetBehavior>().hungryNeed.currentNeedLevel = 0;
-                Destroy(gameObject);
+                transform.position = GameObject.Find("Pet Mouth").transform.position;
+
+                StartCoroutine(WaitAndDestroy());
             }
         }
-    }
 
+        IEnumerator WaitAndDestroy()
+        {
+            yield return new WaitForSeconds(2);
+            Destroy(gameObject);
+        }
+    }
 }
