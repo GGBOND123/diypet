@@ -8,6 +8,8 @@ namespace diypet
     public class PetBehavior : MonoBehaviour {
         private FSMSystem fsm;
 
+        public bool runPetBehavior;
+
         public string currentState;
 
         private Transition interruptedStateTransition;
@@ -18,8 +20,6 @@ namespace diypet
 
         [Serializable]
         public class Need {
-            // Do we want needs to have a maximum value that they can't build past?
-            // Yes
             [HideInInspector]
             public StateID needID;
             [HideInInspector]
@@ -29,21 +29,20 @@ namespace diypet
             public float maxNeedLevel;
             public float needThreshold;
             [Range(1, 30)]
-            public float minNeedGainRate;
+            public float minNeedChangeRate;
             [Range(1, 30)]
-            public float maxNeedGainRate;
+            public float maxNeedChangeRate;
 
             public float timeSpentInNeed;
 
         }
-        // Just replace this with individual need classes
-        //public Need[] needs;
 
         public Need hungryNeed;
         public Need dirtyNeed;
         public Need sleepyNeed;
         public Need lonelyNeed;
         public Need boredNeed;
+        public Need happyNeed;
 
         public float fallAsleepThreshold;
         [Range(1, 20)]
@@ -51,8 +50,21 @@ namespace diypet
         [Range(1, 20)]
         public float maxSleepTime;
 
+        private bool leaveInterruptedState = false;
+        private float screamTime;
+        private float currentScreamTime;
+
+        [Range(1, 10)]
+        public float minTimeScreaming;
+        [Range(1, 10)]
+        public float maxTimeScreaming;
+
         public float timeSpentSatisifed = 0;
         public float timeSpentScreaming = 0;
+
+        [HideInInspector]
+        public Animator petAnimator;
+
 
         public void SetTransition(Transition t) {
             fsm.PerformTransition(t);
@@ -72,12 +84,20 @@ namespace diypet
             lonelyNeed.transition = Transition.IsLonely;
             boredNeed.needID = StateID.Bored;
             boredNeed.transition = Transition.IsBored;
+
+            petAnimator = gameObject.GetComponent<Animator>();
         }
 
         public void Update() {
-            currentState = fsm.CurrentStateID.ToString();
-            fsm.CurrentState.Reason();
-            fsm.CurrentState.Act();
+            if (runPetBehavior) {
+                currentState = fsm.CurrentStateID.ToString();
+                fsm.CurrentState.Reason();
+                fsm.CurrentState.Act();
+                // This is a bad hack, I'm sorry
+                if (leaveInterruptedState) {
+                    EndScreaming();
+                }
+            }
         }
 
         private void MakeFSM() {
@@ -105,10 +125,13 @@ namespace diypet
             BoredState bored = new BoredState(this);
             bored.AddTransition(Transition.IsSatisfied, StateID.Satisified);
 
+            HappyState happy = new HappyState(this);
+            happy.AddTransition(Transition.IsSatisfied, StateID.Satisified);
+
 
             // Create immediate conditions/states
-            ScreamingState freeFalling = new ScreamingState(this);
-            freeFalling.AddTransition(Transition.IsSatisfied, StateID.Satisified);
+            ScreamingState screaming = new ScreamingState(this);
+            screaming.AddTransition(Transition.IsSatisfied, StateID.Satisified);
 
             fsm = new FSMSystem();
             fsm.AddState(satisfied);
@@ -117,11 +140,14 @@ namespace diypet
             fsm.AddState(sleepy);
             fsm.AddState(lonely);
             fsm.AddState(bored);
-            fsm.AddState(freeFalling);
+            fsm.AddState(screaming);
+            fsm.AddState(happy);
         }
 
         private void GetPreInterruptedState() {
             // Sorry, this is kind of gross
+            // We grab the state the pet was in before transitioning to the
+            // immediate state
 
             if (fsm.CurrentStateID != StateID.Satisified) {
                 switch (fsm.CurrentStateID) {
@@ -140,11 +166,18 @@ namespace diypet
                     case StateID.Bored:
                         interruptedStateTransition = Transition.IsBored;
                         break;
+                    case StateID.Happy:
+                        interruptedStateTransition = Transition.IsHappy;
+                        break;
                 }
             }
         }
 
         private void ReturnToPreInterruptedState() {
+            // Also gross
+            // Return to the state we were in before the immediate state
+            // Important to note that we do step briefly into the satisfied state
+            // before returning to the state that was interrupted
             fsm.PerformTransition(Transition.IsSatisfied);
             if (interruptedStateTransition != Transition.IsSatisfied) {
                 fsm.PerformTransition(interruptedStateTransition);
@@ -152,39 +185,90 @@ namespace diypet
             interruptedStateTransition = Transition.IsSatisfied;
         }
 
-        public void IncrementAllNeeds() {
-            // This will take each individual need and increment it per call
-            // for each need it will take the min and max and randomly pick a value
-            // within that range
-            IncrementNeed(hungryNeed);
-            IncrementNeed(dirtyNeed);
-            IncrementNeed(sleepyNeed);
-            IncrementNeed(lonelyNeed);
-            IncrementNeed(boredNeed);
+        public void IncrementAllReactiveNeeds() {
+            // Takes each reactive need and increments it
+            // Each need will be incremented by a random value between
+            // minNeedChangeRate and maxNeedChangeRate for each need
+            IncrementReactiveNeed(hungryNeed);
+            IncrementReactiveNeed(dirtyNeed);
+            IncrementReactiveNeed(sleepyNeed);
+            IncrementReactiveNeed(lonelyNeed);
+            IncrementReactiveNeed(boredNeed);
         }
 
-        //        public void IncrementNeed(StateID needID) {
-        public void IncrementNeed(Need need) {
-            // Increment the value of an individual need
+        public void IncrementReactiveNeed(Need need) {
+            // Increment the value of an individual reactive need
             float needVal = 0;
-            if (need.minNeedGainRate >= need.maxNeedGainRate) {
-                needVal = need.maxNeedGainRate;
+            if (need.minNeedChangeRate >= need.maxNeedChangeRate) {
+                needVal = need.maxNeedChangeRate;
             } else {
-                needVal = UnityEngine.Random.Range(need.minNeedGainRate, need.maxNeedGainRate);
+                needVal = UnityEngine.Random.Range(need.minNeedChangeRate, need.maxNeedChangeRate);
             }
             need.currentNeedLevel += needVal * Time.deltaTime;
             need.currentNeedLevel = Mathf.Clamp(need.currentNeedLevel, 0, need.maxNeedLevel);
         }
 
-        // States/Conditions and their related function calls
+        public void DecrementAllActiveNeeds() {
+            // Takes each active need and decrements it
+            // Each need will be decremented by a random value between
+            // minNeedChangeRate and maxNeedChangeRate for each need
+            DecrementActiveNeed(happyNeed);
+        }
+
+        public void DecrementActiveNeed(Need need) {
+            // Decrement the value of an individual active need
+            float needVal = 0;
+            if (need.minNeedChangeRate >= need.maxNeedChangeRate) {
+                needVal = need.maxNeedChangeRate;
+            } else {
+                needVal = UnityEngine.Random.Range(need.minNeedChangeRate, need.maxNeedChangeRate);
+            }
+            need.currentNeedLevel -= needVal * Time.deltaTime;
+            need.currentNeedLevel = Mathf.Clamp(need.currentNeedLevel, 0, need.maxNeedLevel);
+        }
+
+        public bool ReactiveNeedsAboveThreshold() {
+            bool needAboveThreshold = false;
+
+            if (hungryNeed.currentNeedLevel >= hungryNeed.needThreshold) {
+                needAboveThreshold = true;
+            }
+            else if (dirtyNeed.currentNeedLevel >= dirtyNeed.needThreshold) {
+                needAboveThreshold = true;
+            }
+            else if (sleepyNeed.currentNeedLevel >= sleepyNeed.needThreshold) {
+                needAboveThreshold = true;
+            }
+            else if (lonelyNeed.currentNeedLevel >= lonelyNeed.needThreshold) {
+                needAboveThreshold = true;
+            }
+            else if (boredNeed.currentNeedLevel >= boredNeed.needThreshold) {
+                needAboveThreshold = true;
+            }
+            return needAboveThreshold;
+        }
+
+        // SatisifedState is the baseline state for the pet
 
         public class SatisifiedState : FSMState {
 
             private PetBehavior behavior;
+            private GameObject petGameObject;
+            private Animator petAnimator;
 
             public SatisifiedState(PetBehavior petBehavior) {
                 stateID = StateID.Satisified;
                 behavior = petBehavior;
+                petGameObject = behavior.gameObject;
+                petAnimator = behavior.petAnimator;
+            }
+
+            public override void DoBeforeEntering() {
+                
+            }
+
+            public override void DoBeforeLeaving() {
+                
             }
 
             public override void Reason() {
@@ -219,22 +303,93 @@ namespace diypet
             }
 
             public override void Act() {
-                behavior.IncrementAllNeeds();
+                behavior.IncrementAllReactiveNeeds();
+                behavior.DecrementAllActiveNeeds();
                 behavior.timeSpentSatisifed += Time.deltaTime;
 
                 // Satisfied behaviors/animations go here
             }
         }
 
+        // Active States/Conditions and their related function calls
+        // Active states are exited for a couple of reasons:
+        // 1. A reactive need has reached it's threshold and therefore needs to be moved to OR:
+        // 2. The leve of the Active state falls below it's threshold and so it falls back into
+        // the satisified state.
+        // Active states lose their currentNeedLevel each update by minNeedChangeRate and maxNeedChangeRate
+
+        public class HappyState : FSMState {
+            private PetBehavior behavior;
+            private GameObject petGameObject;
+            private Animator petAnimator;
+
+            public HappyState(PetBehavior petBehavior) {
+                stateID = StateID.Happy;
+                behavior = petBehavior;
+                petGameObject = behavior.gameObject;
+                petAnimator = behavior.petAnimator;
+            }
+
+            public override void DoBeforeEntering() {
+
+            }
+
+            public override void DoBeforeLeaving() {
+
+            }
+
+            public override void Reason() {
+                
+                if (behavior.ReactiveNeedsAboveThreshold()) {
+                    behavior.SetTransition(Transition.IsSatisfied);
+                } else if (behavior.happyNeed.needThreshold >= behavior.happyNeed.currentNeedLevel) {
+                    behavior.SetTransition(Transition.IsSatisfied);
+                }
+            }
+
+            public override void Act() {
+                if (behavior.parallelResourceLoss) {
+                    behavior.IncrementAllReactiveNeeds();
+                    behavior.DecrementAllActiveNeeds();
+                } else {
+                    behavior.DecrementActiveNeed(behavior.happyNeed);
+                }
+                behavior.happyNeed.timeSpentInNeed += Time.deltaTime;
+
+                // Happy behaviors go here
+            }
+        }
+
+        public void MakePetHappy(float happyAmount) {
+            happyNeed.currentNeedLevel += happyAmount;
+            if (hungryNeed.currentNeedLevel > happyNeed.maxNeedLevel) {
+                hungryNeed.currentNeedLevel = happyNeed.maxNeedLevel;
+            }
+        }
+
+        // Reactive States/Conditions and their related function calls
+
         public class HungryState : FSMState {
 
             private PetBehavior behavior;
+            private GameObject petGameObject;
+            private Animator petAnimator;
 
             public HungryState(PetBehavior petBehavior) {
                 stateID = StateID.Hungry;
                 behavior = petBehavior;
+                petGameObject = behavior.gameObject;
+                petAnimator = behavior.petAnimator;
             }
-            
+
+            public override void DoBeforeEntering() {
+
+            }
+
+            public override void DoBeforeLeaving() {
+
+            }
+
             public override void Reason() {
                 if (behavior.hungryNeed.currentNeedLevel <= 0) {
                     behavior.SetTransition(Transition.IsSatisfied);
@@ -243,9 +398,10 @@ namespace diypet
 
             public override void Act() {
                 if (behavior.parallelResourceLoss) {
-                    behavior.IncrementAllNeeds();
+                    behavior.IncrementAllReactiveNeeds();
+                    behavior.DecrementAllActiveNeeds();
                 } else {
-                    behavior.IncrementNeed(behavior.hungryNeed);
+                    behavior.IncrementReactiveNeed(behavior.hungryNeed);
                 }
                 behavior.hungryNeed.timeSpentInNeed += Time.deltaTime;
                 // Hungry behaviors/animations go here
@@ -261,11 +417,23 @@ namespace diypet
 
         public class DirtyState : FSMState {
 
-            private PetBehavior behavior = null;
+            private PetBehavior behavior;
+            private GameObject petGameObject;
+            private Animator petAnimator;
 
             public DirtyState(PetBehavior petBehavior) {
                 stateID = StateID.Dirty;
                 behavior = petBehavior;
+                petGameObject = behavior.gameObject;
+                petAnimator = behavior.petAnimator;
+            }
+
+            public override void DoBeforeEntering() {
+
+            }
+
+            public override void DoBeforeLeaving() {
+
             }
 
             public override void Reason() {
@@ -276,9 +444,10 @@ namespace diypet
 
             public override void Act() {
                 if (behavior.parallelResourceLoss) {
-                    behavior.IncrementAllNeeds();
+                    behavior.IncrementAllReactiveNeeds();
+                    behavior.DecrementAllActiveNeeds();
                 } else {
-                    behavior.IncrementNeed(behavior.dirtyNeed);
+                    behavior.IncrementReactiveNeed(behavior.dirtyNeed);
                 }
                 behavior.dirtyNeed.timeSpentInNeed += Time.deltaTime;
                 // Dirty behaviors/animations go here
@@ -295,17 +464,29 @@ namespace diypet
         public class SleepyState : FSMState {
 
             private PetBehavior behavior;
+            private GameObject petGameObject;
+            private Animator petAnimator;
             private float timeToSleep;
             private float timeSlept;
 
             public SleepyState(PetBehavior petBehavior) {
                 stateID = StateID.Sleepy;
                 behavior = petBehavior;
+                petGameObject = behavior.gameObject;
+                petAnimator = behavior.petAnimator;
             }
 
             public override void DoBeforeEntering() {
-                timeToSleep = UnityEngine.Random.Range(behavior.minSleepTime, behavior.maxSleepTime);
+                if (behavior.minSleepTime >= behavior.maxSleepTime) {
+                    timeToSleep = behavior.maxSleepTime;
+                } else {
+                    timeToSleep = UnityEngine.Random.Range(behavior.minSleepTime, behavior.maxSleepTime);
+                }
                 timeSlept = 0;
+            }
+
+            public override void DoBeforeLeaving() {
+
             }
 
             public override void Reason() {
@@ -316,27 +497,16 @@ namespace diypet
 
             public override void Act() {
                 if (behavior.parallelResourceLoss) {
-                    behavior.IncrementAllNeeds();
+                    behavior.IncrementAllReactiveNeeds();
+                    behavior.DecrementAllActiveNeeds();
                 } else {
-                    behavior.IncrementNeed(behavior.sleepyNeed);
+                    behavior.IncrementReactiveNeed(behavior.sleepyNeed);
                 }
-
-                // Sleepy/Sleep are special in the conditions/states
-                // in that a single State covers both of the needs.
-                // If we were to spend more time on this I would probably
-                // Split them out into separate states, however due to choices
-                // I made earlier this is probably the best way to approach this
-
                 behavior.sleepyNeed.timeSpentInNeed += Time.deltaTime;
-                if (behavior.sleepyNeed.currentNeedLevel >= behavior.fallAsleepThreshold) {
-                    // Sleep behaviors/animations go here
-                    timeSlept += Time.deltaTime;
-                    if (timeSlept >= timeToSleep) {
-                        behavior.WakePet(behavior.sleepyNeed.currentNeedLevel);
-                    }
-                } else {
-                    // Sleepy behaviors/animations go here
-                }
+
+                // Sleepy and sleep behaviors/animations go here
+                // If needed timeToSleep and timeSlept are available for use if needed
+
             }
         }
 
@@ -350,10 +520,22 @@ namespace diypet
         public class LonelyState : FSMState {
 
             private PetBehavior behavior;
+            private GameObject petGameObject;
+            private Animator petAnimator;
 
             public LonelyState(PetBehavior petBehavior) {
                 stateID = StateID.Lonely;
                 behavior = petBehavior;
+                petGameObject = behavior.gameObject;
+                petAnimator = behavior.petAnimator;
+            }
+
+            public override void DoBeforeEntering() {
+
+            }
+
+            public override void DoBeforeLeaving() {
+
             }
 
             public override void Reason() {
@@ -364,9 +546,10 @@ namespace diypet
 
             public override void Act() {
                 if (behavior.parallelResourceLoss) {
-                    behavior.IncrementAllNeeds();
+                    behavior.IncrementAllReactiveNeeds();
+                    behavior.DecrementAllActiveNeeds();
                 } else {
-                    behavior.IncrementNeed(behavior.lonelyNeed);
+                    behavior.IncrementReactiveNeed(behavior.lonelyNeed);
                 }
                 behavior.lonelyNeed.timeSpentInNeed += Time.deltaTime;
                 // Lonely behaviors/animations go here
@@ -383,10 +566,22 @@ namespace diypet
         public class BoredState : FSMState {
 
             private PetBehavior behavior;
+            private GameObject petGameObject;
+            private Animator petAnimator;
 
             public BoredState(PetBehavior petBehavior) {
                 stateID = StateID.Bored;
                 behavior = petBehavior;
+                petGameObject = behavior.gameObject;
+                petAnimator = behavior.petAnimator;
+            }
+
+            public override void DoBeforeEntering() {
+
+            }
+
+            public override void DoBeforeLeaving() {
+
             }
 
             public override void Reason() {
@@ -397,9 +592,10 @@ namespace diypet
 
             public override void Act() {
                 if (behavior.parallelResourceLoss) {
-                    behavior.IncrementAllNeeds();
+                    behavior.IncrementAllReactiveNeeds();
+                    behavior.DecrementAllActiveNeeds();
                 } else {
-                    behavior.IncrementNeed(behavior.boredNeed);
+                    behavior.IncrementReactiveNeed(behavior.boredNeed);
                 }
                 behavior.boredNeed.timeSpentInNeed += Time.deltaTime;
                 // Bored behaviors/animations go here
@@ -418,10 +614,22 @@ namespace diypet
         public class ScreamingState : FSMState {
 
             PetBehavior behavior;
+            private GameObject petGameObject;
+            private Animator petAnimator;
 
             public ScreamingState(PetBehavior petBehavior) {
                 stateID = StateID.Screaming;
                 behavior = petBehavior;
+                petGameObject = behavior.gameObject;
+                petAnimator = behavior.petAnimator;
+            }
+
+            public override void DoBeforeEntering() {
+
+            }
+
+            public override void DoBeforeLeaving() {
+
             }
 
             public override void Reason() {
@@ -429,12 +637,25 @@ namespace diypet
             }
 
             public override void Act() {
+                if (behavior.parallelResourceLoss) {
+                    behavior.IncrementAllReactiveNeeds();
+                    behavior.DecrementAllActiveNeeds();
+                }
                 behavior.timeSpentScreaming += Time.deltaTime;
                 // Screaming behaviors/animations go here
             }
+
         }
 
+        // Terrible hack below. I'm sorry, it was so nice before
         public void StartScreaming() {
+            leaveInterruptedState = false;
+            if (minTimeScreaming >= maxTimeScreaming) {
+                screamTime = maxTimeScreaming;
+            } else {
+                screamTime = UnityEngine.Random.Range(minTimeScreaming, maxTimeScreaming);
+            }
+            currentScreamTime = 0;
             if (fsm.CurrentStateID != StateID.Screaming) {
                 GetPreInterruptedState();
                 if (fsm.CurrentStateID != StateID.Satisified) {
@@ -445,8 +666,15 @@ namespace diypet
         }
 
         public void EndScreaming() {
+            leaveInterruptedState = true;
             if (fsm.CurrentStateID == StateID.Screaming) {
-                ReturnToPreInterruptedState();
+                if (screamTime >= currentScreamTime) {
+                    leaveInterruptedState = false;
+                    currentScreamTime = 0;
+                    ReturnToPreInterruptedState();
+                } else {
+                    currentScreamTime += Time.deltaTime;
+                }
             }
         }
     }
