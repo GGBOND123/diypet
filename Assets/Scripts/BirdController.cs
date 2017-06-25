@@ -14,7 +14,7 @@ public class BirdController : MonoBehaviour {
 	}
 	
 	void Update () {
-        transform.RotateAround(Vector3.zero, Vector3.up, this.speed * Time.deltaTime);
+        transform.RotateAround(this.target.transform.position, Vector3.up, this.speed * Time.deltaTime);
         transform.LookAt(Vector3.up);
 
         if (this.despawn >= 60f)
