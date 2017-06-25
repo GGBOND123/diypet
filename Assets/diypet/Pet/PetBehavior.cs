@@ -62,7 +62,7 @@ namespace diypet
         public float timeSpentSatisifed = 0;
         public float timeSpentScreaming = 0;
 
-        [HideInInspector]
+        //[HideInInspector]
         public Animator petAnimator;
 
 
@@ -445,12 +445,13 @@ namespace diypet
 
             public override void DoBeforeEntering()
             {
-                petAnimator.SetBool("Dirty", true);
+                //angry rather than dirty until i get dirty animations in --thomas
+                petAnimator.SetBool("Angry", true);
             }
 
             public override void DoBeforeLeaving()
             {
-                petAnimator.SetBool("Dirty", false);
+                petAnimator.SetBool("Angry", false);
             }
 
             public override void Reason() {
