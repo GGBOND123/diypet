@@ -84,6 +84,8 @@ namespace diypet
             lonelyNeed.transition = Transition.IsLonely;
             boredNeed.needID = StateID.Bored;
             boredNeed.transition = Transition.IsBored;
+            happyNeed.needID = StateID.Happy;
+            happyNeed.transition = Transition.IsHappy;
 
             petAnimator = gameObject.GetComponent<Animator>();
             StartCoroutine(Blink());
@@ -119,6 +121,7 @@ namespace diypet
             satisfied.AddTransition(Transition.IsLonely, StateID.Lonely);
             satisfied.AddTransition(Transition.IsBored, StateID.Bored);
             satisfied.AddTransition(Transition.IsScreaming, StateID.Screaming);
+            satisfied.AddTransition(Transition.IsHappy, StateID.Happy);
 
             HungryState hungry = new HungryState(this);
             hungry.AddTransition(Transition.IsSatisfied, StateID.Satisified);
@@ -284,7 +287,8 @@ namespace diypet
             public override void Reason() {
 
                 List<Need> needToBeAddressed = new List<Need>();
-                // We go through each need and see if any are over the threshold
+                List<Need> activeNeeds = new List<Need>();
+                // We go through each reactive need and see if any are over the threshold
                 // and need to change states
                 if (behavior.hungryNeed.currentNeedLevel >= behavior.hungryNeed.needThreshold) {
                     needToBeAddressed.Add(behavior.hungryNeed);
@@ -302,11 +306,24 @@ namespace diypet
                     needToBeAddressed.Add(behavior.boredNeed);
                 }
 
-                // If any are over the threshold for action we choose one state over
-                // threshold to move to randomly
-                if (needToBeAddressed.Count == 1) {
+                // If no reactive states need to be moved to move to active states if
+                // they are above threshold
+                if (needToBeAddressed.Count == 0) {
+                    if (behavior.happyNeed.currentNeedLevel >= behavior.happyNeed.needThreshold) {
+                        activeNeeds.Add(behavior.happyNeed);
+                    }
+
+                    if (activeNeeds.Count == 1) {
+                        behavior.SetTransition(activeNeeds[0].transition);
+                    } else if (activeNeeds.Count > 1) {
+                        int activeNeedIdx = UnityEngine.Random.Range(0, activeNeeds.Count);
+                        behavior.SetTransition(activeNeeds[activeNeedIdx].transition);
+                    }
+                } else if (needToBeAddressed.Count == 1) {
                     behavior.SetTransition(needToBeAddressed[0].transition);
                 } else if (needToBeAddressed.Count > 1) {
+                    // If any reactive needs are over the threshold for action we choose one state over
+                    // threshold to move to randomly
                     int needIdx = UnityEngine.Random.Range(0, needToBeAddressed.Count);
                     behavior.SetTransition(needToBeAddressed[needIdx].transition);
                 }
