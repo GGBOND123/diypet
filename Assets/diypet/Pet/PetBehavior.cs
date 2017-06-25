@@ -86,6 +86,7 @@ namespace diypet
             boredNeed.transition = Transition.IsBored;
 
             petAnimator = gameObject.GetComponent<Animator>();
+            StartCoroutine(Blink());
         }
 
         public void Update() {
@@ -98,6 +99,15 @@ namespace diypet
                     EndScreaming();
                 }
             }
+        }
+
+        private IEnumerator Blink()
+        {
+            //these don't have to be hardcoded values it was just the easiest way to write at 1:18am --thomas
+            float randomBlink = UnityEngine.Random.Range(3f, 6f);
+            yield return new WaitForSeconds(randomBlink);
+            petAnimator.SetTrigger("Blink");
+            StartCoroutine(Blink());
         }
 
         private void MakeFSM() {
@@ -264,11 +274,11 @@ namespace diypet
             }
 
             public override void DoBeforeEntering() {
-                
+                petAnimator.SetBool("Satisfied", true);
             }
 
             public override void DoBeforeLeaving() {
-                
+                petAnimator.SetBool("Satisfied", false);
             }
 
             public override void Reason() {
@@ -330,12 +340,14 @@ namespace diypet
                 petAnimator = behavior.petAnimator;
             }
 
-            public override void DoBeforeEntering() {
-
+            public override void DoBeforeEntering()
+            {
+                petAnimator.SetBool("Happy", true);
             }
 
-            public override void DoBeforeLeaving() {
-
+            public override void DoBeforeLeaving()
+            {
+                petAnimator.SetBool("Happy", false);
             }
 
             public override void Reason() {
@@ -382,12 +394,14 @@ namespace diypet
                 petAnimator = behavior.petAnimator;
             }
 
-            public override void DoBeforeEntering() {
-
+            public override void DoBeforeEntering()
+            {
+                petAnimator.SetBool("Hungry", true);
             }
 
-            public override void DoBeforeLeaving() {
-
+            public override void DoBeforeLeaving()
+            {
+                petAnimator.SetBool("Hungry", false);
             }
 
             public override void Reason() {
@@ -413,6 +427,7 @@ namespace diypet
             if (hungryNeed.currentNeedLevel < 0) {
                 hungryNeed.currentNeedLevel = 0;
             }
+            petAnimator.SetTrigger("Eat");
         }
 
         public class DirtyState : FSMState {
@@ -428,12 +443,14 @@ namespace diypet
                 petAnimator = behavior.petAnimator;
             }
 
-            public override void DoBeforeEntering() {
-
+            public override void DoBeforeEntering()
+            {
+                petAnimator.SetBool("Dirty", true);
             }
 
-            public override void DoBeforeLeaving() {
-
+            public override void DoBeforeLeaving()
+            {
+                petAnimator.SetBool("Dirty", false);
             }
 
             public override void Reason() {
@@ -483,10 +500,11 @@ namespace diypet
                     timeToSleep = UnityEngine.Random.Range(behavior.minSleepTime, behavior.maxSleepTime);
                 }
                 timeSlept = 0;
+                petAnimator.SetBool("Sleeping", true);
             }
 
             public override void DoBeforeLeaving() {
-
+                petAnimator.SetBool("Sleeping", false);
             }
 
             public override void Reason() {
@@ -531,11 +549,11 @@ namespace diypet
             }
 
             public override void DoBeforeEntering() {
-
+                petAnimator.SetBool("Sad", true);
             }
 
             public override void DoBeforeLeaving() {
-
+                petAnimator.SetBool("Sad", false);
             }
 
             public override void Reason() {
@@ -577,11 +595,11 @@ namespace diypet
             }
 
             public override void DoBeforeEntering() {
-
+                petAnimator.SetBool("Bored", true);
             }
 
             public override void DoBeforeLeaving() {
-
+                petAnimator.SetBool("Bored", false);
             }
 
             public override void Reason() {
@@ -625,11 +643,11 @@ namespace diypet
             }
 
             public override void DoBeforeEntering() {
-
+                petAnimator.SetBool("Shocked", true);
             }
 
             public override void DoBeforeLeaving() {
-
+                petAnimator.SetBool("Shocked", false);
             }
 
             public override void Reason() {
