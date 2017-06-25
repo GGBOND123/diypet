@@ -61,6 +61,7 @@ public enum Transition
     IsSleepy,
     IsLonely,
     IsBored,
+    IsHappy,
     IsScreaming
 }
 
@@ -77,6 +78,7 @@ public enum StateID
     Sleepy,
     Lonely,
     Bored,
+    Happy,
     Screaming
 }
 
