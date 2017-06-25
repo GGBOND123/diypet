@@ -668,9 +668,8 @@ namespace diypet
         public void EndScreaming() {
             leaveInterruptedState = true;
             if (fsm.CurrentStateID == StateID.Screaming) {
-                if (screamTime >= currentScreamTime) {
+                if (currentScreamTime >= screamTime) {
                     leaveInterruptedState = false;
-                    currentScreamTime = 0;
                     ReturnToPreInterruptedState();
                 } else {
                     currentScreamTime += Time.deltaTime;
