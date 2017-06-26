@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace diypet {
-    public class Timer : MonoBehaviour {
+    public class TimeManager : MonoBehaviour {
 
         private bool started = true;
         public float runningTime;
+		public float lengthOfGame;
         public GameObject bird;
         public GameObject flood;
+		public EndDisplay endDisplay;
+		public Timer timer;
 
         private bool bird_spawn = false;
-        private bool flood_spawn = false;
+        private bool flood_raise_done = false;
+		private bool gameOver = false;
 
 	    // Use this for initialization
 	    void Start () {
@@ -25,20 +29,27 @@ namespace diypet {
                 runningTime += Time.deltaTime;
             }
 
-            if (runningTime >= 120 && !this.bird_spawn)
+            if (runningTime >= 60 && !bird_spawn)
             {
                 this.bird.GetComponent<BirdController>().enabled = true;
+				bird_spawn = true;
             }
 
-            if (runningTime >= 200 && !this.flood_spawn)
+            if (runningTime >= 90 && !flood_raise_done)
             {
                 RaiseFlood();    
             }
+
+			if (runningTime > lengthOfGame && !gameOver) {
+				endDisplay.SetResult ();
+				gameOver = true;
+			}
         }
 
         public void TurnOn()
         {
             started = true;
+			timer.on = true;
         }
 
         public void RaiseFlood()
@@ -47,7 +58,7 @@ namespace diypet {
 
             if (this.flood.transform.position.y >= -33f)
             {
-                this.flood_spawn = true;
+                this.flood_raise_done = true;
             } 
         }
     }

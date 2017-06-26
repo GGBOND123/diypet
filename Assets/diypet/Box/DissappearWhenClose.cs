@@ -8,12 +8,17 @@ namespace diypet
     {
         public GameObject head;
         private bool wasClose = false;
-        public Timer timer;
+        public TimeManager timeManager;
+
+		public bool onAtStart = false;
 
         // Use this for initialization
         void Start()
         {
-
+			if (onAtStart) {
+				wasClose = true;
+				timeManager.TurnOn ();
+			}
         }
 
         // Update is called once per frame
@@ -24,7 +29,7 @@ namespace diypet
                 if (transform.position != Vector3.zero)
                 {
                     wasClose = true;
-                    timer.TurnOn();
+                    timeManager.TurnOn();
                 }
             }            
 

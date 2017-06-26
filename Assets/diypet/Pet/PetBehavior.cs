@@ -87,7 +87,7 @@ namespace diypet
             happyNeed.needID = StateID.Happy;
             happyNeed.transition = Transition.IsHappy;
 
-            petAnimator = gameObject.GetComponent<Animator>();
+            //petAnimator = gameObject.GetComponent<Animator>();
             StartCoroutine(Blink());
         }
 
